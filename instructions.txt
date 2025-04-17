@@ -1,0 +1,55 @@
+## Instructions for building and running a Docker container on a Raspberry Pi 4
+
+### Prerequisites
+
+1.  **Raspberry Pi 4:** Ensure you have a Raspberry Pi 4 with a compatible operating system (e.g., Raspberry Pi OS).
+2.  **Docker:** Install Docker on your Raspberry Pi 4. You can follow the official Docker installation guide for Raspberry Pi:
+
+    ```bash
+    curl -fsSL https://get.docker.com -o get-docker.sh
+    sudo sh get-docker.sh
+    sudo usermod -aG docker $USER
+    newgrp docker
+    ```
+
+### Steps
+
+1.  **Copy the Dockerfile and your project files:**
+
+    *   Place the Dockerfile provided earlier in the root directory of your Next.js project.
+    *   Ensure all your project files (including `package.json`, `src/`, etc.) are in the same directory.
+
+2.  **Build the Docker image:**
+
+    *   Open a terminal in the root directory of your project (where the Dockerfile is located).
+    *   Run the following command to build the Docker image:
+
+        ```bash
+        docker build --platform linux/arm64 -t your-image-name .
+        ```
+
+        Replace `your-image-name` with a suitable name for your Docker image. The `--platform linux/arm64` flag is crucial to ensure the image is built for the Raspberry Pi 4's architecture.
+
+3.  **Run the Docker container:**
+
+    *   After the image is built successfully, run the following command to create and start a Docker container from the image:
+
+        ```bash
+        docker run -p 3000:3000 your-image-name
+        ```
+
+        This command maps port 3000 on your Raspberry Pi to port 3000 inside the container. You can access the application by opening a web browser and navigating to `http://<raspberry-pi-ip>:3000`.
+
+### Additional Notes
+
+*   **Environment Variables:** If your Next.js application relies on environment variables, make sure to set them appropriately when running the Docker container. You can pass environment variables using the `-e` flag:
+
+    ```bash
+    docker run -p 3000:3000 -e YOUR_VARIABLE=your_value your-image-name
+    ```
+
+*   **Docker Compose:** For more complex setups, consider using Docker Compose to define and manage multi-container applications.
+
+*   **Raspberry Pi Performance:** Keep in mind that the Raspberry Pi 4 has limited resources. Optimize your Next.js application for performance to ensure smooth operation.
+
+*   **Registry:** You may need to log into a Docker registry (e.g., Docker Hub) to push or pull images.
