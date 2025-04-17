@@ -14,6 +14,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
+  DialogFooter
 } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
 
@@ -44,6 +45,13 @@ export default function Home() {
   const [ratePerKilometer, setRatePerKilometer] = useState<number>(0.40);
   const [minDisplacementCharge, setMinDisplacementCharge] = useState<number>(15);
   const [ivaRate, setIvaRate] = useState<number>(0.21);
+
+    // Preference values temp state for dialog
+  const [tempHourlyRate, setTempHourlyRate] = useState<number>(35);
+  const [tempRatePerKilometer, setTempRatePerKilometer] = useState<number>(0.40);
+  const [tempMinDisplacementCharge, setTempMinDisplacementCharge] = useState<number>(15);
+  const [tempIvaRate, setTempIvaRate] = useState<number>(0.21);
+
 
   const addMaterial = () => {
     if (newMaterialName.trim() !== "" && newMaterialPrice !== undefined) {
@@ -104,6 +112,28 @@ export default function Home() {
     const newTotal = newSubtotal + newIva;
     setTotal(newTotal);
   }, [materials, hoursWorked, kilometers, hourlyRate, ratePerKilometer, minDisplacementCharge, ivaRate]);
+
+  const handlePreferencesSave = () => {
+        setHourlyRate(tempHourlyRate);
+        setRatePerKilometer(tempRatePerKilometer);
+        setMinDisplacementCharge(tempMinDisplacementCharge);
+        setIvaRate(tempIvaRate);
+    };
+
+    const handlePreferencesCancel = () => {
+        setTempHourlyRate(hourlyRate);
+        setTempRatePerKilometer(ratePerKilometer);
+        setTempMinDisplacementCharge(minDisplacementCharge);
+        setTempIvaRate(ivaRate);
+    };
+
+    const handlePreferencesOpen = () => {
+        setTempHourlyRate(hourlyRate);
+        setTempRatePerKilometer(ratePerKilometer);
+        setTempMinDisplacementCharge(minDisplacementCharge);
+        setTempIvaRate(ivaRate);
+    };
+
 
   return (
     <div className="container mx-auto p-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -197,7 +227,7 @@ export default function Home() {
       
       {/* Preferences Menu */}
         <div className="fixed bottom-4 right-4">
-        <Dialog>
+        <Dialog onOpenChange={ (open) => { if(!open) handlePreferencesCancel()}}>
           <DialogTrigger asChild>
             <Button variant="outline">Preferences</Button>
           </DialogTrigger>
@@ -216,8 +246,8 @@ export default function Home() {
                 <Input
                   type="number"
                   id="hourlyRate"
-                  value={hourlyRate}
-                  onChange={(e) => setHourlyRate(Number(e.target.value))}
+                  value={tempHourlyRate}
+                  onChange={(e) => setTempHourlyRate(Number(e.target.value))}
                   className="col-span-3"
                 />
               </div>
@@ -228,8 +258,8 @@ export default function Home() {
                 <Input
                   type="number"
                   id="ratePerKilometer"
-                  value={ratePerKilometer}
-                  onChange={(e) => setRatePerKilometer(Number(e.target.value))}
+                  value={tempRatePerKilometer}
+                  onChange={(e) => setTempRatePerKilometer(Number(e.target.value))}
                   className="col-span-3"
                 />
               </div>
@@ -240,8 +270,8 @@ export default function Home() {
                 <Input
                   type="number"
                   id="minDisplacementCharge"
-                  value={minDisplacementCharge}
-                  onChange={(e) => setMinDisplacementCharge(Number(e.target.value))}
+                  value={tempMinDisplacementCharge}
+                  onChange={(e) => setTempMinDisplacementCharge(Number(e.target.value))}
                   className="col-span-3"
                 />
               </div>
@@ -252,12 +282,20 @@ export default function Home() {
                 <Input
                   type="number"
                   id="ivaRate"
-                  value={ivaRate}
-                  onChange={(e) => setIvaRate(Number(e.target.value))}
+                  value={tempIvaRate}
+                  onChange={(e) => setTempIvaRate(Number(e.target.value))}
                   className="col-span-3"
                 />
               </div>
             </div>
+            <DialogFooter>
+              <Button type="button" variant="secondary" onClick={handlePreferencesCancel}>
+                Cancel
+              </Button>
+              <Button type="button" onClick={handlePreferencesSave}>
+                OK
+              </Button>
+            </DialogFooter>
           </DialogContent>
         </Dialog>
         </div>
@@ -265,3 +303,4 @@ export default function Home() {
     </div>
   );
 }
+
