@@ -1,10 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { List, ListItem } from "@/components/ui/list";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Toaster } from "@/components/ui/toaster"
+import { useToast } from "@/hooks/use-toast"
 
 const IVA_RATE = 0.21;
 const MIN_DISPLACEMENT_CHARGE = 15;
@@ -19,11 +21,16 @@ export default function Home() {
   const [subtotal, setSubtotal] = useState<number>(0);
   const [iva, setIva] = useState<number>(0);
   const [total, setTotal] = useState<number>(0);
+  const { toast } = useToast()
 
   const addMaterial = () => {
     if (newMaterial.trim() !== "") {
       setMaterials([...materials, newMaterial]);
       setNewMaterial("");
+       toast({
+        title: "Material Added",
+        description: "The material has been successfully added to the list.",
+      })
     }
   };
 
@@ -31,9 +38,13 @@ export default function Home() {
     const updatedMaterials = [...materials];
     updatedMaterials.splice(index, 1);
     setMaterials(updatedMaterials);
+     toast({
+        title: "Material Deleted",
+        description: "The material has been successfully deleted from the list.",
+      })
   };
 
-  const calculateInvoice = () => {
+  useEffect(() => {
     // Calculate materials cost (assuming each material costs 1 unit for simplicity)
     const materialsCost = materials.length;
 
@@ -55,12 +66,12 @@ export default function Home() {
     // Calculate total
     const newTotal = newSubtotal + newIva;
     setTotal(newTotal);
-  };
+  }, [materials, hoursWorked, hourlyRate, kilometers, ratePerKilometer]);
 
   return (
     <div className="container mx-auto p-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
       {/* Materials Input */}
-      <Card className="bg-gray-100">
+      <Card className="bg-gray-100 rounded-lg shadow-md">
         <CardHeader>
           <CardTitle>Materials</CardTitle>
         </CardHeader>
@@ -71,14 +82,15 @@ export default function Home() {
               placeholder="Add material"
               value={newMaterial}
               onChange={(e) => setNewMaterial(e.target.value)}
+              className="border-gray-300 rounded-md shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
             />
-            <Button onClick={addMaterial}>Add</Button>
+            <Button onClick={addMaterial} className="bg-blue-300 text-black rounded-md shadow-sm hover:bg-blue-400 focus:outline-none focus:ring focus:ring-blue-200 focus:ring-opacity-50">Add</Button>
           </div>
           <List className="mt-2">
             {materials.map((material, index) => (
-              <ListItem key={index} className="flex justify-between items-center">
+              <ListItem key={index} className="flex justify-between items-center py-2 px-3 border-b border-gray-200 last:border-b-0">
                 {material}
-                <Button variant="outline" size="sm" onClick={() => deleteMaterial(index)}>
+                <Button variant="outline" size="sm" onClick={() => deleteMaterial(index)} className="text-red-500 hover:text-red-700 focus:outline-none">
                   Delete
                 </Button>
               </ListItem>
@@ -88,7 +100,7 @@ export default function Home() {
       </Card>
 
       {/* Hours Calculation */}
-      <Card className="bg-gray-100">
+      <Card className="bg-gray-100 rounded-lg shadow-md">
         <CardHeader>
           <CardTitle>Hours Worked</CardTitle>
         </CardHeader>
@@ -99,19 +111,21 @@ export default function Home() {
               placeholder="Hours worked"
               value={hoursWorked}
               onChange={(e) => setHoursWorked(Number(e.target.value))}
+              className="border-gray-300 rounded-md shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
             />
             <Input
               type="number"
               placeholder="Hourly rate"
               value={hourlyRate}
               onChange={(e) => setHourlyRate(Number(e.target.value))}
+              className="border-gray-300 rounded-md shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
             />
           </div>
         </CardContent>
       </Card>
 
       {/* Displacement Calculation */}
-      <Card className="bg-gray-100">
+      <Card className="bg-gray-100 rounded-lg shadow-md">
         <CardHeader>
           <CardTitle>Displacement</CardTitle>
         </CardHeader>
@@ -122,26 +136,25 @@ export default function Home() {
               placeholder="Kilometers (one way)"
               value={kilometers}
               onChange={(e) => setKilometers(Number(e.target.value))}
+              className="border-gray-300 rounded-md shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
             />
             <Input
               type="number"
               placeholder="Rate per kilometer"
               value={ratePerKilometer}
               onChange={(e) => setRatePerKilometer(Number(e.target.value))}
+              className="border-gray-300 rounded-md shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
             />
           </div>
         </CardContent>
       </Card>
 
       {/* Total Calculation and Display */}
-      <Card className="bg-gray-100">
+      <Card className="bg-gray-100 rounded-lg shadow-md">
         <CardHeader>
           <CardTitle>Invoice Summary</CardTitle>
         </CardHeader>
         <CardContent className="grid gap-2">
-          <Button onClick={calculateInvoice} className="bg-blue-300 text-black">
-            Calculate Invoice
-          </Button>
           <div>Subtotal: {subtotal.toFixed(2)}</div>
           <div>IVA (21%): {iva.toFixed(2)}</div>
           <div>Total: {total.toFixed(2)}</div>
@@ -150,37 +163,4 @@ export default function Home() {
         <Toaster />
     </div>
   );
-}
-
-import {
-  Toast,
-  ToastClose,
-  ToastDescription,
-  ToastProvider,
-  ToastTitle,
-  ToastViewport,
-} from "@/components/ui/toast"
-
-export function Toaster() {
-  const toasts = []
-
-  return (
-    <ToastProvider>
-      {toasts.map(function ({ id, title, description, action, ...props }) {
-        return (
-          <Toast key={id} {...props}>
-            <div className="grid gap-1">
-              {title && <ToastTitle>{title}</ToastTitle>}
-              {description && (
-                <ToastDescription>{description}</ToastDescription>
-              )}
-            </div>
-            {action}
-            <ToastClose />
-          </Toast>
-        )
-      })}
-      <ToastViewport />
-    </ToastProvider>
-  )
 }
