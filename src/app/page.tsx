@@ -107,70 +107,6 @@ export default function Home() {
 
   return (
     <div className="container mx-auto p-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {/* Preferences Menu */}
-        <Dialog>
-          <DialogTrigger asChild>
-            <Button variant="outline">Preferences</Button>
-          </DialogTrigger>
-          <DialogContent className="sm:max-w-[425px]">
-            <DialogHeader>
-              <DialogTitle>Edit Preferences</DialogTitle>
-              <DialogDescription>
-                Adjust the values used for invoice calculations.
-              </DialogDescription>
-            </DialogHeader>
-            <div className="grid gap-4 py-4">
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="hourlyRate" className="text-right">
-                  Hourly Rate
-                </Label>
-                <Input
-                  type="number"
-                  id="hourlyRate"
-                  value={hourlyRate}
-                  onChange={(e) => setHourlyRate(Number(e.target.value))}
-                  className="col-span-3"
-                />
-              </div>
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="ratePerKilometer" className="text-right">
-                  Rate per Kilometer
-                </Label>
-                <Input
-                  type="number"
-                  id="ratePerKilometer"
-                  value={ratePerKilometer}
-                  onChange={(e) => setRatePerKilometer(Number(e.target.value))}
-                  className="col-span-3"
-                />
-              </div>
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="minDisplacementCharge" className="text-right">
-                  Min. Displacement Charge
-                </Label>
-                <Input
-                  type="number"
-                  id="minDisplacementCharge"
-                  value={minDisplacementCharge}
-                  onChange={(e) => setMinDisplacementCharge(Number(e.target.value))}
-                  className="col-span-3"
-                />
-              </div>
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="ivaRate" className="text-right">
-                  IVA Rate (%)
-                </Label>
-                <Input
-                  type="number"
-                  id="ivaRate"
-                  value={ivaRate}
-                  onChange={(e) => setIvaRate(Number(e.target.value))}
-                  className="col-span-3"
-                />
-              </div>
-            </div>
-          </DialogContent>
-        </Dialog>
 
       {/* Materials Input */}
       <Card className="bg-gray-100 rounded-lg shadow-md">
@@ -258,6 +194,73 @@ export default function Home() {
           <div>Total: ${total.toFixed(2)}</div>
         </CardContent>
       </Card>
+      
+      {/* Preferences Menu */}
+        <div className="fixed bottom-4 right-4">
+        <Dialog>
+          <DialogTrigger asChild>
+            <Button variant="outline">Preferences</Button>
+          </DialogTrigger>
+          <DialogContent className="sm:max-w-[425px]">
+            <DialogHeader>
+              <DialogTitle>Edit Preferences</DialogTitle>
+              <DialogDescription>
+                Adjust the values used for invoice calculations.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="grid gap-4 py-4">
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="hourlyRate" className="text-right">
+                  Hourly Rate
+                </Label>
+                <Input
+                  type="number"
+                  id="hourlyRate"
+                  value={hourlyRate}
+                  onChange={(e) => setHourlyRate(Number(e.target.value))}
+                  className="col-span-3"
+                />
+              </div>
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="ratePerKilometer" className="text-right">
+                  Rate per Kilometer
+                </Label>
+                <Input
+                  type="number"
+                  id="ratePerKilometer"
+                  value={ratePerKilometer}
+                  onChange={(e) => setRatePerKilometer(Number(e.target.value))}
+                  className="col-span-3"
+                />
+              </div>
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="minDisplacementCharge" className="text-right">
+                  Min. Displacement Charge
+                </Label>
+                <Input
+                  type="number"
+                  id="minDisplacementCharge"
+                  value={minDisplacementCharge}
+                  onChange={(e) => setMinDisplacementCharge(Number(e.target.value))}
+                  className="col-span-3"
+                />
+              </div>
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="ivaRate" className="text-right">
+                  IVA Rate (%)
+                </Label>
+                <Input
+                  type="number"
+                  id="ivaRate"
+                  value={ivaRate}
+                  onChange={(e) => setIvaRate(Number(e.target.value))}
+                  className="col-span-3"
+                />
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
+        </div>
       <Toaster />
     </div>
   );
