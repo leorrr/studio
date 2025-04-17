@@ -113,12 +113,14 @@ export default function Home() {
             ))}
           </List>
             {/*<div>Total Material Cost: {materialsCost.toFixed(2)}</div>*/}
+           <div>Total Material Cost: {materialsCost.toFixed(2)}</div>
             <Input
                 type="number"
                 placeholder="Total material cost"
                 value={totalMaterialsCostInput}
                 onChange={handleTotalMaterialsCostInputChange}
                 className="border-gray-300 rounded-md shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
+                hidden={true}
             />
         </CardContent>
       </Card>
