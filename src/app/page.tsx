@@ -71,8 +71,13 @@ export default function Home() {
     setHoursCost(newHoursCost);
 
     // Calculate displacement cost
-    let newDisplacementCost = kilometers * 2 * RATE_PER_KILOMETER;
-    newDisplacementCost = newDisplacementCost < MIN_DISPLACEMENT_CHARGE ? MIN_DISPLACEMENT_CHARGE : newDisplacementCost;
+    let newDisplacementCost = 0;
+    if (kilometers === 0) {
+      newDisplacementCost = 0;
+    } else {
+      newDisplacementCost = kilometers * 2 * RATE_PER_KILOMETER;
+      newDisplacementCost = newDisplacementCost < MIN_DISPLACEMENT_CHARGE ? MIN_DISPLACEMENT_CHARGE : newDisplacementCost;
+    }
     setDisplacementCost(newDisplacementCost)
 
     // Calculate subtotal
