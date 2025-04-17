@@ -15,9 +15,9 @@ export default function Home() {
   const [materials, setMaterials] = useState<string[]>([]);
   const [newMaterial, setNewMaterial] = useState("");
   const [hoursWorked, setHoursWorked] = useState<number>(0);
-  const [hourlyRate, setHourlyRate] = useState<number>(50); // Example default
+  const [hourlyRate, setHourlyRate] = useState<number>(35); // Example default
   const [kilometers, setKilometers] = useState<number>(0);
-  const [ratePerKilometer, setRatePerKilometer] = useState<number>(0.5); // Example default
+  const [ratePerKilometer, setRatePerKilometer] = useState<number>(0.40); // Example default
   const [subtotal, setSubtotal] = useState<number>(0);
   const [iva, setIva] = useState<number>(0);
   const [total, setTotal] = useState<number>(0);
@@ -26,6 +26,8 @@ export default function Home() {
     const [materialsCost, setMaterialsCost] = useState<number>(0);
     const [hoursCost, setHoursCost] = useState<number>(0);
     const [displacementCost, setDisplacementCost] = useState<number>(0);
+
+      const [totalMaterialsCostInput, setTotalMaterialsCostInput] = useState<number>(0);
 
 
   const addMaterial = () => {
@@ -49,10 +51,16 @@ export default function Home() {
       })
   };
 
+    const handleTotalMaterialsCostInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const value = Number(e.target.value);
+        setTotalMaterialsCostInput(value);
+    };
+
   useEffect(() => {
     // Calculate materials cost (assuming each material costs 1 unit for simplicity)
-    const newMaterialsCost = materials.length;
-    setMaterialsCost(newMaterialsCost);
+    //const newMaterialsCost = materials.length;
+    //setMaterialsCost(newMaterialsCost);
+      setMaterialsCost(totalMaterialsCostInput);
 
     // Calculate hours cost
     const newHoursCost = hoursWorked * hourlyRate;
@@ -64,7 +72,7 @@ export default function Home() {
     setDisplacementCost(newDisplacementCost)
 
     // Calculate subtotal
-    const newSubtotal = newMaterialsCost + newHoursCost + newDisplacementCost;
+    const newSubtotal = totalMaterialsCostInput + newHoursCost + newDisplacementCost;
     setSubtotal(newSubtotal);
 
     // Calculate IVA
@@ -74,7 +82,7 @@ export default function Home() {
     // Calculate total
     const newTotal = newSubtotal + newIva;
     setTotal(newTotal);
-  }, [materials, hoursWorked, hourlyRate, kilometers, ratePerKilometer]);
+  }, [materials, hoursWorked, hourlyRate, kilometers, ratePerKilometer, totalMaterialsCostInput]);
 
   return (
     <div className="container mx-auto p-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -104,7 +112,14 @@ export default function Home() {
               </ListItem>
             ))}
           </List>
-            <div>Total Material Cost: {materialsCost.toFixed(2)}</div>
+            {/*<div>Total Material Cost: {materialsCost.toFixed(2)}</div>*/}
+            <Input
+                type="number"
+                placeholder="Total material cost"
+                value={totalMaterialsCostInput}
+                onChange={handleTotalMaterialsCostInputChange}
+                className="border-gray-300 rounded-md shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
+            />
         </CardContent>
       </Card>
 
