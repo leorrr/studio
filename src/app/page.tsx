@@ -23,6 +23,11 @@ export default function Home() {
   const [total, setTotal] = useState<number>(0);
   const { toast } = useToast()
 
+    const [materialsCost, setMaterialsCost] = useState<number>(0);
+    const [hoursCost, setHoursCost] = useState<number>(0);
+    const [displacementCost, setDisplacementCost] = useState<number>(0);
+
+
   const addMaterial = () => {
     if (newMaterial.trim() !== "") {
       setMaterials([...materials, newMaterial]);
@@ -46,17 +51,20 @@ export default function Home() {
 
   useEffect(() => {
     // Calculate materials cost (assuming each material costs 1 unit for simplicity)
-    const materialsCost = materials.length;
+    const newMaterialsCost = materials.length;
+    setMaterialsCost(newMaterialsCost);
 
     // Calculate hours cost
-    const hoursCost = hoursWorked * hourlyRate;
+    const newHoursCost = hoursWorked * hourlyRate;
+    setHoursCost(newHoursCost);
 
     // Calculate displacement cost
-    let displacementCost = kilometers * 2 * ratePerKilometer;
-    displacementCost = displacementCost < MIN_DISPLACEMENT_CHARGE ? MIN_DISPLACEMENT_CHARGE : displacementCost;
+    let newDisplacementCost = kilometers * 2 * ratePerKilometer;
+    newDisplacementCost = newDisplacementCost < MIN_DISPLACEMENT_CHARGE ? MIN_DISPLACEMENT_CHARGE : newDisplacementCost;
+    setDisplacementCost(newDisplacementCost)
 
     // Calculate subtotal
-    const newSubtotal = materialsCost + hoursCost + displacementCost;
+    const newSubtotal = newMaterialsCost + newHoursCost + newDisplacementCost;
     setSubtotal(newSubtotal);
 
     // Calculate IVA
@@ -96,6 +104,7 @@ export default function Home() {
               </ListItem>
             ))}
           </List>
+            <div>Total Material Cost: {materialsCost.toFixed(2)}</div>
         </CardContent>
       </Card>
 
@@ -121,6 +130,7 @@ export default function Home() {
               className="border-gray-300 rounded-md shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
             />
           </div>
+             <div>Total Hours Cost: {hoursCost.toFixed(2)}</div>
         </CardContent>
       </Card>
 
@@ -146,6 +156,7 @@ export default function Home() {
               className="border-gray-300 rounded-md shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
             />
           </div>
+           <div>Displacement Cost: {displacementCost.toFixed(2)}</div>
         </CardContent>
       </Card>
 
