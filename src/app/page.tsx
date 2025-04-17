@@ -7,11 +7,15 @@ import { List, ListItem } from "@/components/ui/list";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Toaster } from "@/components/ui/toaster"
 import { useToast } from "@/hooks/use-toast"
-
-const IVA_RATE = 0.21;
-const MIN_DISPLACEMENT_CHARGE = 15;
-const HOURLY_RATE = 35;
-const RATE_PER_KILOMETER = 0.40;
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
+import { Label } from "@/components/ui/label"
 
 type Material = {
   name: string;
@@ -22,8 +26,10 @@ export default function Home() {
   const [materials, setMaterials] = useState<Material[]>([]);
   const [newMaterialName, setNewMaterialName] = useState("");
   const [newMaterialPrice, setNewMaterialPrice] = useState<number | undefined>(undefined);
+
   const [hoursWorked, setHoursWorked] = useState<number>(0);
   const [kilometers, setKilometers] = useState<number>(0);
+
   const [subtotal, setSubtotal] = useState<number>(0);
   const [iva, setIva] = useState<number>(0);
   const [total, setTotal] = useState<number>(0);
@@ -32,6 +38,12 @@ export default function Home() {
   const [materialsCost, setMaterialsCost] = useState<number>(0);
   const [hoursCost, setHoursCost] = useState<number>(0);
   const [displacementCost, setDisplacementCost] = useState<number>(0);
+
+  // Preference values
+  const [hourlyRate, setHourlyRate] = useState<number>(35);
+  const [ratePerKilometer, setRatePerKilometer] = useState<number>(0.40);
+  const [minDisplacementCharge, setMinDisplacementCharge] = useState<number>(15);
+  const [ivaRate, setIvaRate] = useState<number>(0.21);
 
   const addMaterial = () => {
     if (newMaterialName.trim() !== "" && newMaterialPrice !== undefined) {
@@ -67,7 +79,7 @@ export default function Home() {
     setMaterialsCost(newMaterialsCost);
 
     // Calculate hours cost
-    const newHoursCost = hoursWorked * HOURLY_RATE;
+    const newHoursCost = hoursWorked * hourlyRate;
     setHoursCost(newHoursCost);
 
     // Calculate displacement cost
@@ -75,8 +87,8 @@ export default function Home() {
     if (kilometers === 0) {
       newDisplacementCost = 0;
     } else {
-      newDisplacementCost = kilometers * 2 * RATE_PER_KILOMETER;
-      newDisplacementCost = newDisplacementCost < MIN_DISPLACEMENT_CHARGE ? MIN_DISPLACEMENT_CHARGE : newDisplacementCost;
+      newDisplacementCost = kilometers * 2 * ratePerKilometer;
+      newDisplacementCost = newDisplacementCost < minDisplacementCharge ? minDisplacementCharge : newDisplacementCost;
     }
     setDisplacementCost(newDisplacementCost)
 
@@ -85,16 +97,81 @@ export default function Home() {
     setSubtotal(newSubtotal);
 
     // Calculate IVA
-    const newIva = newSubtotal * IVA_RATE;
+    const newIva = newSubtotal * ivaRate;
     setIva(newIva);
 
     // Calculate total
     const newTotal = newSubtotal + newIva;
     setTotal(newTotal);
-  }, [materials, hoursWorked, kilometers]);
+  }, [materials, hoursWorked, kilometers, hourlyRate, ratePerKilometer, minDisplacementCharge, ivaRate]);
 
   return (
     <div className="container mx-auto p-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {/* Preferences Menu */}
+        <Dialog>
+          <DialogTrigger asChild>
+            <Button variant="outline">Preferences</Button>
+          </DialogTrigger>
+          <DialogContent className="sm:max-w-[425px]">
+            <DialogHeader>
+              <DialogTitle>Edit Preferences</DialogTitle>
+              <DialogDescription>
+                Adjust the values used for invoice calculations.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="grid gap-4 py-4">
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="hourlyRate" className="text-right">
+                  Hourly Rate
+                </Label>
+                <Input
+                  type="number"
+                  id="hourlyRate"
+                  value={hourlyRate}
+                  onChange={(e) => setHourlyRate(Number(e.target.value))}
+                  className="col-span-3"
+                />
+              </div>
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="ratePerKilometer" className="text-right">
+                  Rate per Kilometer
+                </Label>
+                <Input
+                  type="number"
+                  id="ratePerKilometer"
+                  value={ratePerKilometer}
+                  onChange={(e) => setRatePerKilometer(Number(e.target.value))}
+                  className="col-span-3"
+                />
+              </div>
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="minDisplacementCharge" className="text-right">
+                  Min. Displacement Charge
+                </Label>
+                <Input
+                  type="number"
+                  id="minDisplacementCharge"
+                  value={minDisplacementCharge}
+                  onChange={(e) => setMinDisplacementCharge(Number(e.target.value))}
+                  className="col-span-3"
+                />
+              </div>
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="ivaRate" className="text-right">
+                  IVA Rate (%)
+                </Label>
+                <Input
+                  type="number"
+                  id="ivaRate"
+                  value={ivaRate}
+                  onChange={(e) => setIvaRate(Number(e.target.value))}
+                  className="col-span-3"
+                />
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
+
       {/* Materials Input */}
       <Card className="bg-gray-100 rounded-lg shadow-md">
         <CardHeader>
@@ -177,7 +254,7 @@ export default function Home() {
         </CardHeader>
         <CardContent className="grid gap-2">
           <div>Subtotal: ${subtotal.toFixed(2)}</div>
-          <div>IVA (21%): ${iva.toFixed(2)}</div>
+          <div>IVA ({ivaRate * 100}%): ${iva.toFixed(2)}</div>
           <div>Total: ${total.toFixed(2)}</div>
         </CardContent>
       </Card>
