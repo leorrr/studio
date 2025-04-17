@@ -52,6 +52,8 @@ export default function Home() {
   const [tempMinDisplacementCharge, setTempMinDisplacementCharge] = useState<number>(15);
   const [tempIvaRate, setTempIvaRate] = useState<number>(0.21);
 
+    const [open, setOpen] = useState(false);
+
 
   const addMaterial = () => {
     if (newMaterialName.trim() !== "" && newMaterialPrice !== undefined) {
@@ -118,6 +120,7 @@ export default function Home() {
         setRatePerKilometer(tempRatePerKilometer);
         setMinDisplacementCharge(tempMinDisplacementCharge);
         setIvaRate(tempIvaRate);
+        setOpen(false);
     };
 
     const handlePreferencesCancel = () => {
@@ -125,6 +128,7 @@ export default function Home() {
         setTempRatePerKilometer(ratePerKilometer);
         setTempMinDisplacementCharge(minDisplacementCharge);
         setTempIvaRate(ivaRate);
+        setOpen(false);
     };
 
     const handlePreferencesOpen = () => {
@@ -227,7 +231,7 @@ export default function Home() {
       
       {/* Preferences Menu */}
         <div className="fixed bottom-4 right-4">
-        <Dialog onOpenChange={ (open) => { if(!open) handlePreferencesCancel()}}>
+        <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
             <Button variant="outline">Preferences</Button>
           </DialogTrigger>
@@ -303,4 +307,5 @@ export default function Home() {
     </div>
   );
 }
+
 
