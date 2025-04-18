@@ -69,8 +69,8 @@ export default function Home() {
         price: newMaterialPrice, 
         total: newTotal }]);
       setNewMaterialName("");
-      setNewMaterialQuantity(undefined);
-      setNewMaterialPrice(undefined);
+      setNewMaterialQuantity(0);
+      setNewMaterialPrice(0);
       toast({
         title: "Material Added",
         description: "The material has been successfully added to the list.",
