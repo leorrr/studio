@@ -20,12 +20,15 @@ import { Label } from "@/components/ui/label"
 
 type Material = {
   name: string;
+  quantity: number;
   price: number;
+  total: number;
 };
 
 export default function Home() {
   const [materials, setMaterials] = useState<Material[]>([]);
   const [newMaterialName, setNewMaterialName] = useState("");
+  const [newMaterialQuantity, setNewMaterialQuantity] = useState<number | undefined>(undefined);
   const [newMaterialPrice, setNewMaterialPrice] = useState<number | undefined>(undefined);
 
   const [hoursWorked, setHoursWorked] = useState<number>(0);
@@ -56,9 +59,11 @@ export default function Home() {
 
 
   const addMaterial = () => {
-    if (newMaterialName.trim() !== "" && newMaterialPrice !== undefined) {
-      setMaterials([...materials, { name: newMaterialName, price: newMaterialPrice }]);
+    if (newMaterialName.trim() !== "" && newMaterialPrice !== undefined && newMaterialQuantity !== undefined) {
+      const newTotal = newMaterialQuantity * newMaterialPrice;
+      setMaterials([...materials, { name: newMaterialName, quantity: newMaterialQuantity, price: newMaterialPrice, total: newTotal }]);
       setNewMaterialName("");
+      setNewMaterialQuantity(undefined);
       setNewMaterialPrice(undefined);
       toast({
         title: "Material Added",
@@ -67,7 +72,7 @@ export default function Home() {
     } else {
          toast({
         title: "Error",
-        description: "Please enter both material name and price.",
+        description: "Please enter material name, quantity, and price.",
         variant: "destructive"
       });
     }
@@ -85,7 +90,7 @@ export default function Home() {
 
   useEffect(() => {
     // Calculate materials cost
-    const newMaterialsCost = materials.reduce((sum, material) => sum + material.price, 0);
+    const newMaterialsCost = materials.reduce((sum, material) => sum + material.total, 0);
     setMaterialsCost(newMaterialsCost);
 
     // Calculate hours cost
@@ -156,19 +161,27 @@ export default function Home() {
               onChange={(e) => setNewMaterialName(e.target.value)}
               className="border-gray-300 rounded-md shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
             />
+             <Input
+              type="number"
+              placeholder="Quantity"
+              value={newMaterialQuantity}
+              onChange={(e) => setNewMaterialQuantity(Number(e.target.value))}
+              className="border-gray-300 rounded-md shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
+            />
             <Input
               type="number"
-              placeholder="Material price"
+              placeholder="Unit price"
               value={newMaterialPrice}
               onChange={(e) => setNewMaterialPrice(Number(e.target.value))}
               className="border-gray-300 rounded-md shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
             />
+            
             <Button onClick={addMaterial} className="bg-blue-300 text-black rounded-md shadow-sm hover:bg-blue-400 focus:outline-none focus:ring focus:ring-blue-200 focus:ring-opacity-50">Add</Button>
           </div>
           <List className="mt-2">
             {materials.map((material, index) => (
               <ListItem key={index} className="flex justify-between items-center py-2 px-3 border-b border-gray-200 last:border-b-0">
-                {material.name} - ${material.price.toFixed(2)}
+                {material.name} - Quantity: {material.quantity} - Unit Price: ${material.price.toFixed(2)} - Total: ${material.total.toFixed(2)}
                 <Button variant="outline" size="sm" onClick={() => deleteMaterial(index)} className="text-red-500 hover:text-red-700 focus:outline-none">
                   Delete
                 </Button>
@@ -307,5 +320,3 @@ export default function Home() {
     </div>
   );
 }
-
-
