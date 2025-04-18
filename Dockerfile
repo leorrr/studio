@@ -15,8 +15,8 @@ FROM arm64v8/node:18-alpine
 WORKDIR /app
 
 COPY --from=builder /app/.next ./.next
-COPY --from=builder /app/public ./public
+# Check if public directory exists before copying
+RUN if [ -d "/app/public" ]; then cp -r --from=builder /app/public ./public; fi
 COPY --from=builder /app/package.json ./package.json
-COPY --from=builder /app/node_modules ./node_modules
 
 CMD ["npm", "start"]
