@@ -25,17 +25,19 @@
     *   Run the following command to build the Docker image:
 
         ```bash
-        docker build --platform linux/arm64 -t your-image-name .
+        docker build --platform linux/arm64 -t dolorosa .
         ```
 
-        Replace `your-image-name` with a suitable name for your Docker image. The `--platform linux/arm64` flag is crucial to ensure the image is built for the Raspberry Pi 4's architecture.
+        The above command creates the docker image for the app, and names it dolorosa.
+
+        The `--platform linux/arm64` flag is crucial to ensure the image is built for the Raspberry Pi 4's architecture.
 
 3.  **Run the Docker container:**
 
     *   After the image is built successfully, run the following command to create and start a Docker container from the image:
 
         ```bash
-        docker run -p 3000:3000 your-image-name
+        docker run -p 3000:3000 dolorosa
         ```
 
         This command maps port 3000 on your Raspberry Pi to port 3000 inside the container. You can access the application by opening a web browser and navigating to `http://<raspberry-pi-ip>:3000`.
@@ -45,7 +47,7 @@
 *   **Environment Variables:** If your Next.js application relies on environment variables, make sure to set them appropriately when running the Docker container. You can pass environment variables using the `-e` flag:
 
     ```bash
-    docker run -p 3000:3000 -e YOUR_VARIABLE=your_value your-image-name
+    docker run -p 3000:3000 -e YOUR_VARIABLE=your_value dolorosa
     ```
 
 *   **Docker Compose:** For more complex setups, consider using Docker Compose to define and manage multi-container applications.
@@ -53,3 +55,4 @@
 *   **Raspberry Pi Performance:** Keep in mind that the Raspberry Pi 4 has limited resources. Optimize your Next.js application for performance to ensure smooth operation.
 
 *   **Registry:** You may need to log into a Docker registry (e.g., Docker Hub) to push or pull images.
+
