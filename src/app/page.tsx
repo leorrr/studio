@@ -19,6 +19,7 @@ import {
 import { Label } from "@/components/ui/label"
 
 type Material = {
+  id: string;
   name: string;
   quantity: number;
   price: number;
@@ -61,7 +62,12 @@ export default function Home() {
   const addMaterial = () => {
     if (newMaterialName.trim() !== "" && newMaterialPrice !== undefined && newMaterialQuantity !== undefined) {
       const newTotal = newMaterialQuantity * newMaterialPrice;
-      setMaterials([...materials, { name: newMaterialName, quantity: newMaterialQuantity, price: newMaterialPrice, total: newTotal }]);
+      setMaterials([...materials, { 
+        id: crypto.randomUUID(),
+        name: newMaterialName, 
+        quantity: newMaterialQuantity, 
+        price: newMaterialPrice, 
+        total: newTotal }]);
       setNewMaterialName("");
       setNewMaterialQuantity(undefined);
       setNewMaterialPrice(undefined);
@@ -78,15 +84,24 @@ export default function Home() {
     }
   };
 
-  const deleteMaterial = (index: number) => {
-    const updatedMaterials = [...materials];
-    updatedMaterials.splice(index, 1);
+  const deleteMaterial = (id: string) => {
+    const updatedMaterials = materials.filter(material => material.id !== id);
     setMaterials(updatedMaterials);
     toast({
       title: "Material Deleted",
       description: "The material has been successfully deleted from the list.",
     });
   };
+
+    const updateMaterial = (id: string, updatedFields: Partial<Material>) => {
+        const updatedMaterials = materials.map(material => {
+            if (material.id === id) {
+                return { ...material, ...updatedFields, total: (updatedFields.quantity || material.quantity) * (updatedFields.price || material.price) };
+            }
+            return material;
+        });
+        setMaterials(updatedMaterials);
+    };
 
   useEffect(() => {
     // Calculate materials cost
@@ -186,9 +201,41 @@ export default function Home() {
           </div>
           <List className="mt-2">
             {materials.map((material, index) => (
-              <ListItem key={index} className="flex justify-between items-center py-2 px-3 border-b border-gray-200 last:border-b-0">
-                {material.name} - Quantity: {material.quantity} - Unit Price: ${material.price.toFixed(2)} - Total: ${material.total.toFixed(2)}
-                <Button variant="outline" size="sm" onClick={() => deleteMaterial(index)} className="text-red-500 hover:text-red-700 focus:outline-none">
+              <ListItem key={material.id} className="flex justify-between items-center py-2 px-3 border-b border-gray-200 last:border-b-0">
+                
+                <div className="grid grid-cols-4 gap-2">
+                    <div>
+                        <Label htmlFor={`materialName-${material.id}`}>Name</Label>
+                        <Input
+                            type="text"
+                            id={`materialName-${material.id}`}
+                            value={material.name}
+                            onChange={(e) => updateMaterial(material.id, { name: e.target.value })}
+                        />
+                    </div>
+                    <div>
+                        <Label htmlFor={`materialQuantity-${material.id}`}>Quantity</Label>
+                        <Input
+                            type="number"
+                            id={`materialQuantity-${material.id}`}
+                            value={material.quantity}
+                            onChange={(e) => updateMaterial(material.id, { quantity: Number(e.target.value) })}
+                        />
+                    </div>
+                    <div>
+                        <Label htmlFor={`materialPrice-${material.id}`}>Price</Label>
+                        <Input
+                            type="number"
+                            id={`materialPrice-${material.id}`}
+                            value={material.price}
+                            onChange={(e) => updateMaterial(material.id, { price: Number(e.target.value) })}
+                        />
+                    </div>
+                    <div>
+                        Total: ${material.total.toFixed(2)}
+                    </div>
+                </div>
+                <Button variant="outline" size="sm" onClick={() => deleteMaterial(material.id)} className="text-red-500 hover:text-red-700 focus:outline-none">
                   Delete
                 </Button>
               </ListItem>
