@@ -3,6 +3,6 @@ services:
   web:
     image: dolorosa
     ports:
-      - "3000:3000"
+      - "3123:3000"
     platform: linux/arm64
     restart: always
