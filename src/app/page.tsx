@@ -153,23 +153,29 @@ export default function Home() {
           <CardTitle>Materials</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="flex gap-2 mb-2">
+           <div className="grid gap-2 mb-2">
+            <Label htmlFor="materialName">Material Name</Label>
             <Input
               type="text"
+              id="materialName"
               placeholder="Material name"
               value={newMaterialName}
               onChange={(e) => setNewMaterialName(e.target.value)}
               className="border-gray-300 rounded-md shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
             />
+            <Label htmlFor="materialQuantity">Quantity</Label>
              <Input
               type="number"
+              id="materialQuantity"
               placeholder="Quantity"
               value={newMaterialQuantity}
               onChange={(e) => setNewMaterialQuantity(Number(e.target.value))}
               className="border-gray-300 rounded-md shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
             />
+            <Label htmlFor="materialPrice">Unit Price</Label>
             <Input
               type="number"
+              id="materialPrice"
               placeholder="Unit price"
               value={newMaterialPrice}
               onChange={(e) => setNewMaterialPrice(Number(e.target.value))}
