@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { List, ListItem } from "@/components/ui/list";
@@ -59,32 +59,36 @@ export default function Home() {
     const [open, setOpen] = useState(false);
 
 
-    const addMaterial = async () => {
-        if (newMaterialName.trim() !== "") {
-            const newTotal = newMaterialQuantity * newMaterialPrice;
-            const newMaterial = {
-                id: crypto.randomUUID(),
-                name: newMaterialName,
-                quantity: newMaterialQuantity,
-                price: newMaterialPrice,
-                total: newTotal
-            };
-            setMaterials(prevMaterials => [...prevMaterials, newMaterial]);
-            setNewMaterialName("");
-            setNewMaterialQuantity(0);
-            setNewMaterialPrice(0);
-            toast({
-                title: "Material Added",
-                description: "The material has been successfully added to the list.",
-            });
-        } else {
-            toast({
-                title: "Error",
-                description: "Please enter material name, quantity, and price.",
-                variant: "destructive"
-            });
-        }
-    };
+  const calculateMaterialTotal = useCallback((quantity: number, price: number) => {
+      return quantity * price;
+  }, []);
+
+  const addMaterial = async () => {
+      if (newMaterialName.trim() !== "") {
+          const newTotal = calculateMaterialTotal(newMaterialQuantity, newMaterialPrice);
+          const newMaterial = {
+              id: crypto.randomUUID(),
+              name: newMaterialName,
+              quantity: newMaterialQuantity,
+              price: newMaterialPrice,
+              total: newTotal
+          };
+          setMaterials(prevMaterials => [...prevMaterials, newMaterial]);
+          setNewMaterialName("");
+          setNewMaterialQuantity(0);
+          setNewMaterialPrice(0);
+          toast({
+              title: "Material Added",
+              description: "The material has been successfully added to the list.",
+          });
+      } else {
+          toast({
+              title: "Error",
+              description: "Please enter material name, quantity, and price.",
+              variant: "destructive"
+          });
+      }
+  };
 
     const deleteMaterial = async (id: string) => {
         const updatedMaterials = materials.filter(material => material.id !== id);
@@ -96,16 +100,17 @@ export default function Home() {
     };
 
     const updateMaterial = async (id: string, updatedFields: Partial<Material>) => {
-        const updatedMaterials = materials.map(material => {
-            if (material.id === id) {
-                const updatedMaterial = { ...material, ...updatedFields };
-                updatedMaterial.total = (updatedMaterial.quantity) * (updatedMaterial.price);
-                return updatedMaterial;
-            }
-            return material;
-        });
-        setMaterials(updatedMaterials);
-    };
+      setMaterials(prevMaterials =>
+          prevMaterials.map(material => {
+              if (material.id === id) {
+                  const updatedMaterial = { ...material, ...updatedFields };
+                  updatedMaterial.total = calculateMaterialTotal(updatedMaterial.quantity, updatedMaterial.price);
+                  return updatedMaterial;
+              }
+              return material;
+          })
+      );
+  };
 
   useEffect(() => {
     // Calculate materials cost
@@ -137,7 +142,7 @@ export default function Home() {
     // Calculate total
     const newTotal = newSubtotal + newIva;
     setTotal(newTotal);
-  }, [materials, hoursWorked, kilometers, hourlyRate, ratePerKilometer, minDisplacementCharge, ivaRate]);
+  }, [materials, hoursWorked, kilometers, hourlyRate, ratePerKilometer, minDisplacementCharge, ivaRate, calculateMaterialTotal]);
 
   const handlePreferencesSave = () => {
         setHourlyRate(tempHourlyRate);
@@ -171,82 +176,82 @@ export default function Home() {
         <CardHeader>
           <CardTitle>Materials</CardTitle>
         </CardHeader>
-        <CardContent>
-           <div className="grid gap-2 mb-2">
-            <Label htmlFor="materialName">Material Name</Label>
-            <Input
-              type="text"
-              id="materialName"
-              placeholder="Material name"
-              value={newMaterialName}
-              onChange={(e) => setNewMaterialName(e.target.value)}
-              className="border-gray-300 rounded-md shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
-            />
-            <Label htmlFor="materialQuantity">Quantity</Label>
-             <Input
-              type="number"
-              id="materialQuantity"
-              placeholder="Quantity"
-              value={String(newMaterialQuantity)}
-              onChange={(e) => setNewMaterialQuantity(Number(e.target.value))}
-              className="border-gray-300 rounded-md shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
-            />
-            <Label htmlFor="materialPrice">Unit Price</Label>
-            <Input
-              type="number"
-              id="materialPrice"
-              placeholder="Unit price"
-              value={String(newMaterialPrice)}
-              onChange={(e) => setNewMaterialPrice(Number(e.target.value))}
-              className="border-gray-300 rounded-md shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
-            />
-            
-            <Button onClick={addMaterial} className="bg-blue-300 text-black rounded-md shadow-sm hover:bg-blue-400 focus:outline-none focus:ring focus:ring-blue-200 focus:ring-opacity-50">Add</Button>
-          </div>
-          <List className="mt-2">
-            {materials.map((material, index) => (
-              <ListItem key={material.id} className="flex justify-between items-center py-2 px-3 border-b border-gray-200 last:border-b-0">
-                
-                <div className="grid grid-cols-4 gap-2">
-                    <div>
-                        <Label htmlFor={`materialName-${material.id}`}>Name</Label>
-                        <Input
-                            type="text"
-                            id={`materialName-${material.id}`}
-                            value={material.name}
-                            onChange={(e) => updateMaterial(material.id, { name: e.target.value })}
-                        />
-                    </div>
-                    <div>
-                        <Label htmlFor={`materialQuantity-${material.id}`}>Quantity</Label>
-                        <Input
-                            type="number"
-                            id={`materialQuantity-${material.id}`}
-                            value={String(material.quantity)}
-                            onChange={(e) => updateMaterial(material.id, { quantity: Number(e.target.value) })}
-                        />
-                    </div>
-                    <div>
-                        <Label htmlFor={`materialPrice-${material.id}`}>Price</Label>
-                        <Input
-                            type="number"
-                            id={`materialPrice-${material.id}`}
-                            value={String(material.price)}
-                            onChange={(e) => updateMaterial(material.id, { price: Number(e.target.value) })}
-                        />
-                    </div>
-                    <div>
-                        Total: ${material.total.toFixed(2)}
-                    </div>
-                </div>
-                <Button variant="outline" size="sm" onClick={() => deleteMaterial(material.id)} className="text-red-500 hover:text-red-700 focus:outline-none">
-                  Delete
-                </Button>
-              </ListItem>
-            ))}
-          </List>
-          <div>Total Material Cost: ${materialsCost.toFixed(2)}</div>
-        </CardContent>
+          <CardContent>
+              <div className="grid gap-2 mb-2">
+                  <Label htmlFor="materialName">Material Name</Label>
+                  <Input
+                      type="text"
+                      id="materialName"
+                      placeholder="Material name"
+                      value={newMaterialName}
+                      onChange={(e) => setNewMaterialName(e.target.value)}
+                      className="border-gray-300 rounded-md shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
+                  />
+                  <Label htmlFor="materialQuantity">Quantity</Label>
+                  <Input
+                      type="number"
+                      id="materialQuantity"
+                      placeholder="Quantity"
+                      value={String(newMaterialQuantity)}
+                      onChange={(e) => setNewMaterialQuantity(Number(e.target.value))}
+                      className="border-gray-300 rounded-md shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
+                  />
+                  <Label htmlFor="materialPrice">Unit Price</Label>
+                  <Input
+                      type="number"
+                      id="materialPrice"
+                      placeholder="Unit price"
+                      value={String(newMaterialPrice)}
+                      onChange={(e) => setNewMaterialPrice(Number(e.target.value))}
+                      className="border-gray-300 rounded-md shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
+                  />
+
+                  <Button onClick={addMaterial} className="bg-blue-300 text-black rounded-md shadow-sm hover:bg-blue-400 focus:outline-none focus:ring focus:ring-blue-200 focus:ring-opacity-50">Add</Button>
+              </div>
+              <List className="mt-2">
+                  {materials.map((material, index) => (
+                      <ListItem key={material.id} className="flex justify-between items-center py-2 px-3 border-b border-gray-200 last:border-b-0">
+
+                          <div className="grid grid-cols-4 gap-2">
+                              <div>
+                                  <Label htmlFor={`materialName-${material.id}`}>Name</Label>
+                                  <Input
+                                      type="text"
+                                      id={`materialName-${material.id}`}
+                                      value={material.name}
+                                      onChange={(e) => updateMaterial(material.id, { name: e.target.value })}
+                                  />
+                              </div>
+                              <div>
+                                  <Label htmlFor={`materialQuantity-${material.id}`}>Quantity</Label>
+                                  <Input
+                                      type="number"
+                                      id={`materialQuantity-${material.id}`}
+                                      value={String(material.quantity)}
+                                      onChange={(e) => updateMaterial(material.id, { quantity: Number(e.target.value) })}
+                                  />
+                              </div>
+                              <div>
+                                  <Label htmlFor={`materialPrice-${material.id}`}>Price</Label>
+                                  <Input
+                                      type="number"
+                                      id={`materialPrice-${material.id}`}
+                                      value={String(material.price)}
+                                      onChange={(e) => updateMaterial(material.id, { price: Number(e.target.value) })}
+                                  />
+                              </div>
+                              <div>
+                                  Total: ${material.total.toFixed(2)}
+                              </div>
+                          </div>
+                          <Button variant="outline" size="sm" onClick={() => deleteMaterial(material.id)} className="text-red-500 hover:text-red-700 focus:outline-none">
+                              Delete
+                          </Button>
+                      </ListItem>
+                  ))}
+              </List>
+              <div>Total Material Cost: ${materialsCost.toFixed(2)}</div>
+          </CardContent>
       </Card>
 
       {/* Hours Calculation */}
@@ -377,3 +382,4 @@ export default function Home() {
     </div>
   );
 }
+
