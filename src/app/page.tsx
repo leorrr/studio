@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
@@ -29,8 +29,8 @@ type Material = {
 export default function Home() {
   const [materials, setMaterials] = useState<Material[]>([]);
   const [newMaterialName, setNewMaterialName] = useState("");
-  const [newMaterialQuantity, setNewMaterialQuantity] = useState<number | undefined>(undefined);
-  const [newMaterialPrice, setNewMaterialPrice] = useState<number | undefined>(undefined);
+  const [newMaterialQuantity, setNewMaterialQuantity] = useState<number>(0);
+  const [newMaterialPrice, setNewMaterialPrice] = useState<number>(0);
 
   const [hoursWorked, setHoursWorked] = useState<number>(0);
   const [kilometers, setKilometers] = useState<number>(0);
@@ -59,44 +59,48 @@ export default function Home() {
     const [open, setOpen] = useState(false);
 
 
-  const addMaterial = () => {
-    if (newMaterialName.trim() !== "" && newMaterialPrice !== undefined && newMaterialQuantity !== undefined) {
-      const newTotal = newMaterialQuantity * newMaterialPrice;
-      setMaterials([...materials, { 
-        id: crypto.randomUUID(),
-        name: newMaterialName, 
-        quantity: newMaterialQuantity, 
-        price: newMaterialPrice, 
-        total: newTotal }]);
-      setNewMaterialName("");
-      setNewMaterialQuantity(0);
-      setNewMaterialPrice(0);
-      toast({
-        title: "Material Added",
-        description: "The material has been successfully added to the list.",
-      });
-    } else {
-         toast({
-        title: "Error",
-        description: "Please enter material name, quantity, and price.",
-        variant: "destructive"
-      });
-    }
-  };
+    const addMaterial = async () => {
+        if (newMaterialName.trim() !== "") {
+            const newTotal = newMaterialQuantity * newMaterialPrice;
+            const newMaterial = {
+                id: crypto.randomUUID(),
+                name: newMaterialName,
+                quantity: newMaterialQuantity,
+                price: newMaterialPrice,
+                total: newTotal
+            };
+            setMaterials(prevMaterials => [...prevMaterials, newMaterial]);
+            setNewMaterialName("");
+            setNewMaterialQuantity(0);
+            setNewMaterialPrice(0);
+            toast({
+                title: "Material Added",
+                description: "The material has been successfully added to the list.",
+            });
+        } else {
+            toast({
+                title: "Error",
+                description: "Please enter material name, quantity, and price.",
+                variant: "destructive"
+            });
+        }
+    };
 
-  const deleteMaterial = (id: string) => {
-    const updatedMaterials = materials.filter(material => material.id !== id);
-    setMaterials(updatedMaterials);
-    toast({
-      title: "Material Deleted",
-      description: "The material has been successfully deleted from the list.",
-    });
-  };
+    const deleteMaterial = async (id: string) => {
+        const updatedMaterials = materials.filter(material => material.id !== id);
+        setMaterials(updatedMaterials);
+        toast({
+            title: "Material Deleted",
+            description: "The material has been successfully deleted from the list.",
+        });
+    };
 
-    const updateMaterial = (id: string, updatedFields: Partial<Material>) => {
+    const updateMaterial = async (id: string, updatedFields: Partial<Material>) => {
         const updatedMaterials = materials.map(material => {
             if (material.id === id) {
-                return { ...material, ...updatedFields, total: (updatedFields.quantity || material.quantity) * (updatedFields.price || material.price) };
+                const updatedMaterial = { ...material, ...updatedFields };
+                updatedMaterial.total = (updatedMaterial.quantity) * (updatedMaterial.price);
+                return updatedMaterial;
             }
             return material;
         });
@@ -183,7 +187,7 @@ export default function Home() {
               type="number"
               id="materialQuantity"
               placeholder="Quantity"
-              value={newMaterialQuantity}
+              value={String(newMaterialQuantity)}
               onChange={(e) => setNewMaterialQuantity(Number(e.target.value))}
               className="border-gray-300 rounded-md shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
             />
@@ -192,7 +196,7 @@ export default function Home() {
               type="number"
               id="materialPrice"
               placeholder="Unit price"
-              value={newMaterialPrice}
+              value={String(newMaterialPrice)}
               onChange={(e) => setNewMaterialPrice(Number(e.target.value))}
               className="border-gray-300 rounded-md shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
             />
@@ -218,7 +222,7 @@ export default function Home() {
                         <Input
                             type="number"
                             id={`materialQuantity-${material.id}`}
-                            value={material.quantity}
+                            value={String(material.quantity)}
                             onChange={(e) => updateMaterial(material.id, { quantity: Number(e.target.value) })}
                         />
                     </div>
@@ -227,7 +231,7 @@ export default function Home() {
                         <Input
                             type="number"
                             id={`materialPrice-${material.id}`}
-                            value={material.price}
+                            value={String(material.price)}
                             onChange={(e) => updateMaterial(material.id, { price: Number(e.target.value) })}
                         />
                     </div>
@@ -255,7 +259,7 @@ export default function Home() {
             <Input
               type="number"
               placeholder="Hours worked"
-              value={hoursWorked}
+              value={String(hoursWorked)}
               onChange={(e) => setHoursWorked(Number(e.target.value))}
               className="border-gray-300 rounded-md shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
             />
@@ -274,7 +278,7 @@ export default function Home() {
             <Input
               type="number"
               placeholder="Kilometers (one way)"
-              value={kilometers}
+              value={String(kilometers)}
               onChange={(e) => setKilometers(Number(e.target.value))}
               className="border-gray-300 rounded-md shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
             />
@@ -316,7 +320,7 @@ export default function Home() {
                 <Input
                   type="number"
                   id="hourlyRate"
-                  value={tempHourlyRate}
+                  value={String(tempHourlyRate)}
                   onChange={(e) => setTempHourlyRate(Number(e.target.value))}
                   className="col-span-3"
                 />
@@ -328,7 +332,7 @@ export default function Home() {
                 <Input
                   type="number"
                   id="ratePerKilometer"
-                  value={tempRatePerKilometer}
+                  value={String(tempRatePerKilometer)}
                   onChange={(e) => setTempRatePerKilometer(Number(e.target.value))}
                   className="col-span-3"
                 />
@@ -340,7 +344,7 @@ export default function Home() {
                 <Input
                   type="number"
                   id="minDisplacementCharge"
-                  value={tempMinDisplacementCharge}
+                  value={String(tempMinDisplacementCharge)}
                   onChange={(e) => setTempMinDisplacementCharge(Number(e.target.value))}
                   className="col-span-3"
                 />
@@ -352,7 +356,7 @@ export default function Home() {
                 <Input
                   type="number"
                   id="ivaRate"
-                  value={tempIvaRate}
+                  value={String(tempIvaRate)}
                   onChange={(e) => setTempIvaRate(Number(e.target.value))}
                   className="col-span-3"
                 />
