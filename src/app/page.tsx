@@ -1,12 +1,12 @@
 'use client';
 
-import { useState, useEffect, useCallback } from "react";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { List, ListItem } from "@/components/ui/list";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Toaster } from "@/components/ui/toaster"
-import { useToast } from "@/hooks/use-toast"
+import {useState, useEffect, useCallback} from 'react';
+import {Input} from "@/components/ui/input";
+import {Button} from "@/components/ui/button";
+import {List, ListItem} from "@/components/ui/list";
+import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
+import {Toaster} from "@/components/ui/toaster"
+import {useToast} from "@/hooks/use-toast"
 import {
   Dialog,
   DialogContent,
@@ -16,7 +16,7 @@ import {
   DialogTrigger,
   DialogFooter
 } from "@/components/ui/dialog"
-import { Label } from "@/components/ui/label"
+import {Label} from "@/components/ui/label"
 
 type Material = {
   id: string;
@@ -38,7 +38,7 @@ export default function Home() {
   const [subtotal, setSubtotal] = useState<number>(0);
   const [iva, setIva] = useState<number>(0);
   const [total, setTotal] = useState<number>(0);
-  const { toast } = useToast()
+  const {toast} = useToast()
 
   const [materialsCost, setMaterialsCost] = useState<number>(0);
   const [hoursCost, setHoursCost] = useState<number>(0);
@@ -50,66 +50,71 @@ export default function Home() {
   const [minDisplacementCharge, setMinDisplacementCharge] = useState<number>(15);
   const [ivaRate, setIvaRate] = useState<number>(0.21);
 
-    // Preference values temp state for dialog
+  // Preference values temp state for dialog
   const [tempHourlyRate, setTempHourlyRate] = useState<number>(35);
   const [tempRatePerKilometer, setTempRatePerKilometer] = useState<number>(0.40);
   const [tempMinDisplacementCharge, setTempMinDisplacementCharge] = useState<number>(15);
   const [tempIvaRate, setTempIvaRate] = useState<number>(0.21);
 
-    const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(false);
 
 
   const calculateMaterialTotal = useCallback((quantity: number, price: number) => {
-      return quantity * price;
+    return quantity * price;
   }, []);
 
   const addMaterial = async () => {
-      if (newMaterialName.trim() !== "") {
-          const newTotal = calculateMaterialTotal(newMaterialQuantity, newMaterialPrice);
-          const newMaterial = {
-              id: crypto.randomUUID(),
-              name: newMaterialName,
-              quantity: newMaterialQuantity,
-              price: newMaterialPrice,
-              total: newTotal
-          };
-          setMaterials(prevMaterials => [...prevMaterials, newMaterial]);
-          setNewMaterialName("");
-          setNewMaterialQuantity(0);
-          setNewMaterialPrice(0);
-          toast({
-              title: "Material Added",
-              description: "The material has been successfully added to the list.",
-          });
-      } else {
-          toast({
-              title: "Error",
-              description: "Please enter material name, quantity, and price.",
-              variant: "destructive"
-          });
-      }
+    if (newMaterialName.trim() !== "") {
+      const newTotal = calculateMaterialTotal(newMaterialQuantity, newMaterialPrice);
+      const newMaterial = {
+        id: crypto.randomUUID(),
+        name: newMaterialName,
+        quantity: newMaterialQuantity,
+        price: newMaterialPrice,
+        total: newTotal
+      };
+      setMaterials(prevMaterials => {
+        const updatedMaterials = [...prevMaterials, newMaterial];
+        return updatedMaterials;
+      });
+      setNewMaterialName("");
+      setNewMaterialQuantity(0);
+      setNewMaterialPrice(0);
+      toast({
+        title: "Material Added",
+        description: "The material has been successfully added to the list.",
+      });
+    } else {
+      toast({
+        title: "Error",
+        description: "Please enter material name, quantity, and price.",
+        variant: "destructive"
+      });
+    }
   };
 
-    const deleteMaterial = async (id: string) => {
-        const updatedMaterials = materials.filter(material => material.id !== id);
-        setMaterials(updatedMaterials);
-        toast({
-            title: "Material Deleted",
-            description: "The material has been successfully deleted from the list.",
-        });
-    };
+  const deleteMaterial = async (id: string) => {
+    setMaterials(prevMaterials => {
+      const updatedMaterials = prevMaterials.filter(material => material.id !== id);
+      return updatedMaterials;
+    });
+    toast({
+      title: "Material Deleted",
+      description: "The material has been successfully deleted from the list.",
+    });
+  };
 
-    const updateMaterial = async (id: string, updatedFields: Partial<Material>) => {
-      setMaterials(prevMaterials =>
-          prevMaterials.map(material => {
-              if (material.id === id) {
-                  const updatedMaterial = { ...material, ...updatedFields };
-                  updatedMaterial.total = calculateMaterialTotal(updatedMaterial.quantity, updatedMaterial.price);
-                  return updatedMaterial;
-              }
-              return material;
-          })
-      );
+  const updateMaterial = async (id: string, updatedFields: Partial<Material>) => {
+    setMaterials(prevMaterials => {
+      return prevMaterials.map(material => {
+        if (material.id === id) {
+          const updatedMaterial = {...material, ...updatedFields};
+          updatedMaterial.total = calculateMaterialTotal(updatedMaterial.quantity, updatedMaterial.price);
+          return updatedMaterial;
+        }
+        return material;
+      });
+    });
   };
 
   useEffect(() => {
@@ -145,27 +150,27 @@ export default function Home() {
   }, [materials, hoursWorked, kilometers, hourlyRate, ratePerKilometer, minDisplacementCharge, ivaRate, calculateMaterialTotal]);
 
   const handlePreferencesSave = () => {
-        setHourlyRate(tempHourlyRate);
-        setRatePerKilometer(tempRatePerKilometer);
-        setMinDisplacementCharge(tempMinDisplacementCharge);
-        setIvaRate(tempIvaRate);
-        setOpen(false);
-    };
+    setHourlyRate(tempHourlyRate);
+    setRatePerKilometer(tempRatePerKilometer);
+    setMinDisplacementCharge(tempMinDisplacementCharge);
+    setIvaRate(tempIvaRate);
+    setOpen(false);
+  };
 
-    const handlePreferencesCancel = () => {
-        setTempHourlyRate(hourlyRate);
-        setTempRatePerKilometer(ratePerKilometer);
-        setTempMinDisplacementCharge(minDisplacementCharge);
-        setTempIvaRate(ivaRate);
-        setOpen(false);
-    };
+  const handlePreferencesCancel = () => {
+    setTempHourlyRate(hourlyRate);
+    setTempRatePerKilometer(ratePerKilometer);
+    setTempMinDisplacementCharge(minDisplacementCharge);
+    setTempIvaRate(ivaRate);
+    setOpen(false);
+  };
 
-    const handlePreferencesOpen = () => {
-        setTempHourlyRate(hourlyRate);
-        setTempRatePerKilometer(ratePerKilometer);
-        setTempMinDisplacementCharge(minDisplacementCharge);
-        setTempIvaRate(ivaRate);
-    };
+  const handlePreferencesOpen = () => {
+    setTempHourlyRate(hourlyRate);
+    setTempRatePerKilometer(ratePerKilometer);
+    setTempMinDisplacementCharge(minDisplacementCharge);
+    setTempIvaRate(ivaRate);
+  };
 
 
   return (
@@ -176,82 +181,85 @@ export default function Home() {
         <CardHeader>
           <CardTitle>Materials</CardTitle>
         </CardHeader>
-          <CardContent>
-              <div className="grid gap-2 mb-2">
-                  <Label htmlFor="materialName">Material Name</Label>
-                  <Input
+        <CardContent>
+          <div className="grid gap-2 mb-2">
+            <Label htmlFor="materialName">Material Name</Label>
+            <Input
+              type="text"
+              id="materialName"
+              placeholder="Material name"
+              value={newMaterialName}
+              onChange={(e) => setNewMaterialName(e.target.value)}
+              className="border-gray-300 rounded-md shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
+            />
+            <Label htmlFor="materialQuantity">Quantity</Label>
+            <Input
+              type="number"
+              id="materialQuantity"
+              placeholder="Quantity"
+              value={String(newMaterialQuantity)}
+              onChange={(e) => setNewMaterialQuantity(Number(e.target.value))}
+              className="border-gray-300 rounded-md shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
+            />
+            <Label htmlFor="materialPrice">Unit Price</Label>
+            <Input
+              type="number"
+              id="materialPrice"
+              placeholder="Unit price"
+              value={String(newMaterialPrice)}
+              onChange={(e) => setNewMaterialPrice(Number(e.target.value))}
+              className="border-gray-300 rounded-md shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
+            />
+
+            <Button onClick={addMaterial}
+                    className="bg-blue-300 text-black rounded-md shadow-sm hover:bg-blue-400 focus:outline-none focus:ring focus:ring-blue-200 focus:ring-opacity-50">Add</Button>
+          </div>
+          <List className="mt-2">
+            {materials.map((material, index) => (
+              <ListItem key={material.id}
+                        className="flex justify-between items-center py-2 px-3 border-b border-gray-200 last:border-b-0">
+
+                <div className="grid grid-cols-4 gap-2">
+                  <div>
+                    <Label htmlFor={`materialName-${material.id}`}>Name</Label>
+                    <Input
                       type="text"
-                      id="materialName"
-                      placeholder="Material name"
-                      value={newMaterialName}
-                      onChange={(e) => setNewMaterialName(e.target.value)}
-                      className="border-gray-300 rounded-md shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
-                  />
-                  <Label htmlFor="materialQuantity">Quantity</Label>
-                  <Input
+                      id={`materialName-${material.id}`}
+                      value={material.name}
+                      onChange={(e) => updateMaterial(material.id, {name: e.target.value})}
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor={`materialQuantity-${material.id}`}>Quantity</Label>
+                    <Input
                       type="number"
-                      id="materialQuantity"
-                      placeholder="Quantity"
-                      value={String(newMaterialQuantity)}
-                      onChange={(e) => setNewMaterialQuantity(Number(e.target.value))}
-                      className="border-gray-300 rounded-md shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
-                  />
-                  <Label htmlFor="materialPrice">Unit Price</Label>
-                  <Input
+                      id={`materialQuantity-${material.id}`}
+                      value={String(material.quantity)}
+                      onChange={(e) => updateMaterial(material.id, {quantity: Number(e.target.value)})}
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor={`materialPrice-${material.id}`}>Price</Label>
+                    <Input
                       type="number"
-                      id="materialPrice"
-                      placeholder="Unit price"
-                      value={String(newMaterialPrice)}
-                      onChange={(e) => setNewMaterialPrice(Number(e.target.value))}
-                      className="border-gray-300 rounded-md shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
-                  />
-
-                  <Button onClick={addMaterial} className="bg-blue-300 text-black rounded-md shadow-sm hover:bg-blue-400 focus:outline-none focus:ring focus:ring-blue-200 focus:ring-opacity-50">Add</Button>
-              </div>
-              <List className="mt-2">
-                  {materials.map((material, index) => (
-                      <ListItem key={material.id} className="flex justify-between items-center py-2 px-3 border-b border-gray-200 last:border-b-0">
-
-                          <div className="grid grid-cols-4 gap-2">
-                              <div>
-                                  <Label htmlFor={`materialName-${material.id}`}>Name</Label>
-                                  <Input
-                                      type="text"
-                                      id={`materialName-${material.id}`}
-                                      value={material.name}
-                                      onChange={(e) => updateMaterial(material.id, { name: e.target.value })}
-                                  />
-                              </div>
-                              <div>
-                                  <Label htmlFor={`materialQuantity-${material.id}`}>Quantity</Label>
-                                  <Input
-                                      type="number"
-                                      id={`materialQuantity-${material.id}`}
-                                      value={String(material.quantity)}
-                                      onChange={(e) => updateMaterial(material.id, { quantity: Number(e.target.value) })}
-                                  />
-                              </div>
-                              <div>
-                                  <Label htmlFor={`materialPrice-${material.id}`}>Price</Label>
-                                  <Input
-                                      type="number"
-                                      id={`materialPrice-${material.id}`}
-                                      value={String(material.price)}
-                                      onChange={(e) => updateMaterial(material.id, { price: Number(e.target.value) })}
-                                  />
-                              </div>
-                              <div>
-                                  Total: ${material.total.toFixed(2)}
-                              </div>
-                          </div>
-                          <Button variant="outline" size="sm" onClick={() => deleteMaterial(material.id)} className="text-red-500 hover:text-red-700 focus:outline-none">
-                              Delete
-                          </Button>
-                      </ListItem>
-                  ))}
-              </List>
-              <div>Total Material Cost: ${materialsCost.toFixed(2)}</div>
-          </CardContent>
+                      id={`materialPrice-${material.id}`}
+                      value={String(material.price)}
+                      onChange={(e) => updateMaterial(material.id, {price: Number(e.target.value)})}
+                    />
+                  </div>
+                  <div>
+                    Total: ${material.total.toFixed(2)}
+                  </div>
+                </div>
+                <Button variant="outline" size="sm" onClick={() => deleteMaterial(material.id)}
+                        className="text-red-500 hover:text-red-700 focus:outline-none">
+                  Delete
+                </Button>
+              </ListItem>
+            ))}
+          </List>
+          <div>Total Material Cost: ${materialsCost.toFixed(2)}</div>
+        </CardContent>
       </Card>
 
       {/* Hours Calculation */}
@@ -303,9 +311,9 @@ export default function Home() {
           <div>Total: ${total.toFixed(2)}</div>
         </CardContent>
       </Card>
-      
+
       {/* Preferences Menu */}
-        <div className="fixed bottom-4 right-4">
+      <div className="fixed bottom-4 right-4">
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
             <Button variant="outline">Preferences</Button>
@@ -377,9 +385,8 @@ export default function Home() {
             </DialogFooter>
           </DialogContent>
         </Dialog>
-        </div>
-      <Toaster />
+      </div>
+      <Toaster/>
     </div>
   );
 }
-
